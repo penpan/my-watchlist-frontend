@@ -1,11 +1,12 @@
-// @ts-check
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
+import tailwind from "@astrojs/tailwind"; // <--- This now points to v5
+import vercel from "@astrojs/vercel";
 
-import tailwindcss from '@tailwindcss/vite';
+import react from "@astrojs/react";
 
-// https://astro.build/config
 export default defineConfig({
-  vite: {
-    plugins: [tailwindcss()]
-  }
+  output: 'server',
+  adapter: vercel(),
+  integrations: [tailwind(), react()], // <--- Simple and clean
 });

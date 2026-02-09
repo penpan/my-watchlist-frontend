@@ -1,0 +1,60 @@
+---
+// src/pages/dashboard.astro
+import FileUploader from '../components/FileUploader.jsx';
+
+// --- CRITICAL FIX START ---
+// 1. Get the token from the cookie
+const jwt = Astro.cookies.get("jwt")?.value;
+
+// 2. Define your Strapi URL here (Replace with your actual URL)
+const STRAPI_URL = "https://sparkling-diamond-9b93a197bc.strapiapp.com"; 
+// --- CRITICAL FIX END ---
+
+// 3. Security Check: If no token, kick them out
+if (!jwt) {
+  return Astro.redirect("/login");
+}
+
+// 4. Get User Data (Optional but good for "Welcome, Math!")
+let user = { username: "Guest" };
+try {
+  const response = await fetch(`${STRAPI_URL}/api/users/me`, {
+    headers: { Authorization: `Bearer ${jwt}` }
+  });
+  if (response.ok) {
+    user = await response.json();
+  }
+} catch (e) {
+  console.error("Failed to fetch user", e);
+}
+---
+
+<html lang="en">
+  <head>
+    <title>Dashboard - HG Cloud</title>
+  </head>
+  <body class="bg-slate-900 text-white p-10 min-h-screen">
+    <div class="max-w-4xl mx-auto">
+      
+      <div class="flex justify-between items-center mb-10">
+        <h1 class="text-3xl font-bold text-blue-400">📂 HG Internal Files</h1>
+        <div class="flex items-center gap-4 bg-slate-800 px-4 py-2 rounded-full">
+            <span class="font-semibold">Welcome, {user.username}</span>
+            <a href="/logout" class="text-red-400 hover:text-red-300 text-sm font-bold">Logout</a>
+        </div>
+      </div>
+
+      <FileUploader 
+        client:load 
+        jwt={jwt} 
+        strapiUrl={STRAPI_URL} 
+      />
+
+      <h2 class="text-2xl font-bold mt-12 mb-6 border-b border-slate-700 pb-2">
+        Your Recent Uploads
+      </h2>
+      <p class="text-gray-500 italic">No files loaded yet.</p>
+
+    </div>
+  </body>
+</html>
