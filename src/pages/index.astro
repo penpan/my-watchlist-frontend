@@ -1,11 +1,44 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+// src/pages/index.astro
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// OPTION A: If you want to use your LIVE Cloud data:
+// Replace the URL below with the one you copied from the dashboard
+const STRAPI_URL = "https://sparkling-diamond-9b93a197bc.strapiapp.com"; 
+
+// OPTION B: If you want to use your LOCAL data (while 'npm run develop' is running):
+// const STRAPI_URL = "http://localhost:1337";
+
+// Fetch data from Strapi
+const response = await fetch(`${STRAPI_URL}/api/stocks`);
+const json = await response.json();
+const data = json.data;
+
+// console.log(data); // <--- Uncomment this if you want to see the data in your terminal
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<html lang="en">
+  <head>
+    <title>My Stock Watchlist</title>
+  </head>
+  <body class="bg-slate-900 text-white min-h-screen p-10">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-4xl font-bold mb-8 text-blue-400">🚀 My Watchlist</h1>
+      
+      <div class="grid gap-4">
+        {data.map((stock) => (
+          <div class="bg-slate-800 p-6 rounded-lg shadow-lg flex justify-between items-center hover:bg-slate-700 transition">
+            <div>
+              {/* Note: In Strapi 5, we use 'stock.Symbol', NOT 'stock.attributes.Symbol' */}
+              <h2 class="text-2xl font-bold">{stock.Symbol}</h2>
+              <p class="text-gray-400">Stock Ticker</p>
+            </div>
+            <div class="text-3xl font-mono text-green-400">
+              ${stock.Price}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+    </div>
+  </body>
+</html>
